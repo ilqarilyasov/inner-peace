@@ -64,6 +64,7 @@ class ViewController: UIViewController {
             let renderer = UIGraphicsImageRenderer(bounds: quoteRect, format: format)
             
             quoteImageView.image = renderer.image(actions: { (ctx) in
+                ctx.cgContext.setShadow(offset: .zero, blur: 20, color: UIColor.black.cgColor)
                 str.draw(in: quoteRect)
             })
         }
@@ -71,6 +72,10 @@ class ViewController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+        updateQuote()
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         updateQuote()
     }
 }
