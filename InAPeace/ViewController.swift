@@ -61,7 +61,7 @@ class ViewController: UIViewController {
             
             let format = UIGraphicsImageRendererFormat()
             format.opaque = false
-            let renderer = UIGraphicsImageRenderer(bounds: quoteRect, format: format)
+            let renderer = UIGraphicsImageRenderer(bounds: quoteRect.insetBy(dx: -30, dy: -30), format: format)
             
             quoteImageView.image = renderer.image(actions: { (ctx) in
                 for i in 1...5 {
