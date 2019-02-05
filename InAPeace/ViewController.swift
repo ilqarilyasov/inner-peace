@@ -15,6 +15,7 @@ class ViewController: UIViewController {
     
     let quotes = Bundle.main.decode([Quote].self, from: "quotes.json")
     let images = Bundle.main.decode([String].self, from: "pictures.json")
+    var sharedQuote: Quote?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,6 +31,8 @@ class ViewController: UIViewController {
         guard let randomQuote = quotes.randomElement() else {
             fatalError("Unable to read a quote.")
         }
+        
+        sharedQuote = randomQuote
         
         let insetAmount: CGFloat = 250
         let drawBounds = quoteImageView.bounds.inset(by: UIEdgeInsets(top: insetAmount,
@@ -80,5 +83,18 @@ class ViewController: UIViewController {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         updateQuote()
     }
+    
+    @IBAction func shareTapped(_ sender: UIButton) {
+        guard let quote = sharedQuote else {
+            fatalError("Attemting to share a non-existent quote.")
+        }
+        
+        let shareMessage = "\"\(quote.text)\" - \(quote.author)"
+        let ac = UIActivityViewController(activityItems: [shareMessage], applicationActivities: nil)
+        ac.popoverPresentationController?.sourceView = sender
+        
+        present(ac, animated: true)
+    }
+    
 }
 
