@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import UserNotifications
 
 class ViewController: UIViewController {
 
@@ -19,7 +20,13 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        
+        UNUserNotificationCenter.current()
+            .requestAuthorization(options: [.alert, .sound, .badge]) { (success, error) in
+                if success {
+                    self.configureAlerts()
+                }
+        }
     }
 
     private func updateQuote() {
@@ -94,6 +101,42 @@ class ViewController: UIViewController {
         ac.popoverPresentationController?.sourceView = sender
         
         present(ac, animated: true)
+    }
+    
+    private func configureAlerts() {
+        let center = UNUserNotificationCenter.current()
+        
+        center.removeAllDeliveredNotifications()
+        center.removeAllPendingNotificationRequests()
+        
+        let shuffled = quotes.shuffled()
+        
+        for i in 1...7 {
+            let content = UNMutableNotificationContent()
+            content.title = "Inner Peace"
+            content.body = shuffled[i].text
+            
+            var dateComponents = DateComponents()
+            dateComponents.day = i
+            
+            if let alertDate = Calendar.current.date(byAdding: dateComponents, to: Date()) {
+                var alertComponents = Calendar.current.dateComponents([.day, .month, .year], from: alertDate)
+                alertComponents.hour = 10
+                
+                // Use UNCalendarNotificationTrigger in a real app
+//                let trigger = UNCalendarNotificationTrigger(dateMatching: alertComponents, repeats: false)
+                
+                // For mocking the notification we are using UNTimeIntervalNotificationTrigger
+                let trigger = UNTimeIntervalNotificationTrigger(timeInterval: TimeInterval(i) * 5, repeats: false)
+                let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
+                
+                center.add(request) { (error) in
+                    if let error = error {
+                        NSLog("Error presenting notification: \(error)")
+                    }
+                }
+            }
+        }
     }
     
 }
