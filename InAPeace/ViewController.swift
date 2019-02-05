@@ -72,18 +72,18 @@ class ViewController: UIViewController {
             } else {
                 break
             }
-            
-            let format = UIGraphicsImageRendererFormat()
-            format.opaque = false
-            let renderer = UIGraphicsImageRenderer(bounds: quoteRect.insetBy(dx: -30, dy: -30), format: format)
-            
-            return renderer.image(actions: { (ctx) in
-                for i in 1...5 {
-                    ctx.cgContext.setShadow(offset: .zero, blur: CGFloat(i) * 2, color: UIColor.black.cgColor)
-                    str.draw(in: quoteRect)
-                }
-            })
         }
+        
+        let format = UIGraphicsImageRendererFormat()
+        format.opaque = false
+        let renderer = UIGraphicsImageRenderer(bounds: quoteRect.insetBy(dx: -30, dy: -30), format: format)
+        
+        return renderer.image(actions: { (ctx) in
+            for i in 1...5 {
+                ctx.cgContext.setShadow(offset: .zero, blur: CGFloat(i) * 2, color: UIColor.black.cgColor)
+                str.draw(in: quoteRect)
+            }
+        })
     }
 
     
