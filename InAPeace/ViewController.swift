@@ -40,7 +40,11 @@ class ViewController: UIViewController {
         }
         
         sharedQuote = randomQuote
+        quoteImageView.image = render(selectedQuote: randomQuote)
         
+        }
+    
+    private func render(selectedQuote: Quote) -> UIImage {
         let insetAmount: CGFloat = 250
         let drawBounds = quoteImageView.bounds.inset(by: UIEdgeInsets(top: insetAmount,
                                                                       left: insetAmount,
@@ -58,7 +62,7 @@ class ViewController: UIViewController {
         while true {
             font = UIFont(name: "Georgia-Italic", size: fontSize) ?? UIFont.systemFont(ofSize: fontSize)
             attrs = [.font: font, .foregroundColor: UIColor.white]
-            str = NSAttributedString(string: randomQuote.text, attributes: attrs)
+            str = NSAttributedString(string: selectedQuote.text, attributes: attrs)
             quoteRect = str.boundingRect(with: CGSize(width: drawBounds.width,
                                                       height: .greatestFiniteMagnitude),
                                          options: .usesLineFragmentOrigin, context: nil)
@@ -73,7 +77,7 @@ class ViewController: UIViewController {
             format.opaque = false
             let renderer = UIGraphicsImageRenderer(bounds: quoteRect.insetBy(dx: -30, dy: -30), format: format)
             
-            quoteImageView.image = renderer.image(actions: { (ctx) in
+            return renderer.image(actions: { (ctx) in
                 for i in 1...5 {
                     ctx.cgContext.setShadow(offset: .zero, blur: CGFloat(i) * 2, color: UIColor.black.cgColor)
                     str.draw(in: quoteRect)
@@ -81,6 +85,7 @@ class ViewController: UIViewController {
             })
         }
     }
+
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -96,8 +101,7 @@ class ViewController: UIViewController {
             fatalError("Attemting to share a non-existent quote.")
         }
         
-        let shareMessage = "\"\(quote.text)\" - \(quote.author)"
-        let ac = UIActivityViewController(activityItems: [shareMessage], applicationActivities: nil)
+        let ac = UIActivityViewController(activityItems: [quote.shareMessage], applicationActivities: nil)
         ac.popoverPresentationController?.sourceView = sender
         
         present(ac, animated: true)
@@ -116,24 +120,20 @@ class ViewController: UIViewController {
             content.title = "Inner Peace"
             content.body = shuffled[i].text
             
-            var dateComponents = DateComponents()
-            dateComponents.day = i
+            let alertDate = Date().byAdding(days: i)
+            var alertComponents = Calendar.current.dateComponents([.day, .month, .year], from: alertDate)
+            alertComponents.hour = 10
             
-            if let alertDate = Calendar.current.date(byAdding: dateComponents, to: Date()) {
-                var alertComponents = Calendar.current.dateComponents([.day, .month, .year], from: alertDate)
-                alertComponents.hour = 10
-                
-                // Use UNCalendarNotificationTrigger in a real app
-//                let trigger = UNCalendarNotificationTrigger(dateMatching: alertComponents, repeats: false)
-                
-                // For mocking the notification we are using UNTimeIntervalNotificationTrigger
-                let trigger = UNTimeIntervalNotificationTrigger(timeInterval: TimeInterval(i) * 5, repeats: false)
-                let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
-                
-                center.add(request) { (error) in
-                    if let error = error {
-                        NSLog("Error presenting notification: \(error)")
-                    }
+            // Use UNCalendarNotificationTrigger in a real app
+            //                let trigger = UNCalendarNotificationTrigger(dateMatching: alertComponents, repeats: false)
+            
+            // For mocking the notification we are using UNTimeIntervalNotificationTrigger
+            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: TimeInterval(i) * 5, repeats: false)
+            let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
+            
+            center.add(request) { (error) in
+                if let error = error {
+                    NSLog("Error presenting notification: \(error)")
                 }
             }
         }
